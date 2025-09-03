@@ -242,3 +242,40 @@ export const useAuth = () => {
   }
   return context;
 };
+
+
+//Example Flow
+// AuthContext.tsx
+// export const AuthContext = createContext();
+
+// export function AuthProvider({ children }) {
+//   const signIn = async (email, password) => {
+//     return supabase.auth.signInWithPassword({ email, password });
+//   };
+
+//   const signUp = async (email, password) => {
+//     return supabase.auth.signUp({ email, password });
+//   };
+
+//   const signOut = async () => {
+//     return supabase.auth.signOut();
+//   };
+
+//   const forgotPassword = async (email) => {
+//     return supabase.auth.resetPasswordForEmail(email, {
+//       redirectTo: "http://localhost:3000/auth/reset-password",
+//     });
+//   };
+
+//   const resetPassword = async (newPassword) => {
+//     return supabase.auth.updateUser({ password: newPassword });
+//   };
+
+//   return (
+//     <AuthContext.Provider
+//       value={{ signIn, signUp, signOut, forgotPassword, resetPassword }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// }

@@ -64,8 +64,12 @@ export function NavMain({ items, user }: { items: NavSection[]; user: User }) {
   };
 
   const isRouteActive = (url: string) => {
-    if (url === "/" && pathname === "/") return true;
-    return url !== "/" && pathname.startsWith(url);
+    // Exact match for root and overview routes to avoid sticky highlight
+    const path = pathname || "/";
+    if (url === "/") return path === "/";
+    if (url === "/user" || url === "/admin") return path === url;
+    // For other routes, allow prefix match so sections expand/highlight properly
+    return path.startsWith(url);
   };
 
   const filterItems = (items: NavItem[], term: string): NavItem[] => {

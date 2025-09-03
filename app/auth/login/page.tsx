@@ -38,7 +38,7 @@ export default function Login() {
       const result = await signIn(email, password);
 
       // If we get here, login was successful
-      window.location.href = "/";
+      window.location.href = "/redirect";
     } catch (error: any) {
       setIsLoading(false);
 

@@ -38,6 +38,15 @@ export default function Header({ title, url }: { title: string; url: string }) {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
+      {/* Global quick link */}
+      <div className="px-3">
+        <Link
+          href="/user/browse"
+          className="inline-flex items-center rounded-md bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+        >
+          Browse Products
+        </Link>
+      </div>
     </header>
   );
 }

@@ -10,7 +10,8 @@ import { rolesService } from "@/modules/roles/services/roles-service";
 import { Role } from "@/modules/roles/models/role";
 import { useDebounce } from "@/hooks/use-debounce";
 
-export default function UserManagementPage({ type }: { type: string }) {
+export default function 
+UserManagementPage({ type }: { type: string }) {
   const [listUsers, setListUsers] = useState<User[]>([]);
   const [listRoles, setListRoles] = useState<Role[]>([]);
   const [recordCount, setRecordCount] = useState<number>(0);
