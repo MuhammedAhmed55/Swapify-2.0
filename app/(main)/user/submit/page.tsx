@@ -10,7 +10,7 @@ import { supabaseClient } from "@/lib/supabase-auth-client";
 import { toast } from "sonner";
 
 export default function UserSubmitProductPage() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -51,24 +51,36 @@ export default function UserSubmitProductPage() {
       return;
     }
 
-    // 2. Notify all admins dynamically
+    // 2. Notify all admins dynamically (client-side only)
     try {
-      const { data: admins, error: adminError } = await supabaseClient
-        .from("users") // Make sure your "users" table has a "role" column
+      // a) Get admin role id
+      const { data: roleRow, error: roleErr } = await supabaseClient
+        .from("roles")
         .select("id")
-        .eq("role", "admin");
+        .eq("name", "admin")
+        .single();
+      if (roleErr) throw roleErr;
 
-      if (adminError) throw adminError;
+      // b) Get all users with admin role
+      const { data: adminUsers, error: adminsErr } = await supabaseClient
+        .from("user_profile")
+        .select("id")
+        .eq("role_id", roleRow.id);
+      if (adminsErr) throw adminsErr;
 
-      if (admins && admins.length > 0) {
-        const notifications = admins.map((a) => ({
-          user_id: a.id,
-          message: `New product submitted: ${name}`,
+      // c) Insert notifications for those admin users only
+      if (adminUsers && adminUsers.length > 0) {
+        const now = new Date().toISOString();
+        const actorName = userProfile?.first_name || userProfile?.last_name
+          ? `${userProfile?.first_name || ""}${userProfile?.last_name ? " " + userProfile?.last_name : ""}`.trim()
+          : (user?.email || "A user");
+        const notifications = adminUsers.map((u: any) => ({
+          user_id: u.id,
+          message: `${actorName} submitted a new product: ${name}`,
           read_status: false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+          created_at: now,
+          updated_at: now,
         }));
-
         await supabaseClient.from("notifications").insert(notifications);
       }
     } catch (e) {

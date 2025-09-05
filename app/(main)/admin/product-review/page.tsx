@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { supabaseClient } from "@/lib/supabase-auth-client";
+import { useAuth } from "@/context/AuthContext";
 import type { Product } from "@/types/models";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 
 export default function AdminProductReviewPage() {
+  const { userProfile } = useAuth();
   const [loading, setLoading] = useState(true)
   const [products, setProducts] = useState<Product[]>([])
   const [actionId, setActionId] = useState<string | null>(null)
@@ -55,6 +57,31 @@ export default function AdminProductReviewPage() {
       // remove from list if no longer pending
       if (next !== "pending") {
         setProducts((list) => list.filter((p) => p.id !== id))
+      }
+
+      // Insert notification for the specific product owner only (no API route)
+      try {
+        const prod = products.find(p => p.id === id)
+        if (prod?.user_id) {
+          const now = new Date().toISOString()
+          const actorName = (userProfile?.first_name || userProfile?.last_name)
+            ? `${userProfile?.first_name || ""}${userProfile?.last_name ? " " + userProfile?.last_name : ""}`.trim()
+            : "An admin";
+          const verb = next === "approved" ? "approved" : "rejected";
+          const message = `${actorName} ${verb} your product "${prod.name}".`
+          const { error: nerr } = await supabaseClient.from("notifications").insert({
+            user_id: prod.user_id,
+            message,
+            read_status: false,
+            created_at: now,
+            updated_at: now,
+          })
+          if (nerr) {
+            console.warn("Notification insert failed:", nerr.message)
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to insert owner notification", e)
       }
     }
     setActionId(null)

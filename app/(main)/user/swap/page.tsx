@@ -75,6 +75,30 @@ export default function SwapsPage() {
       // optimistic update
       setSwaps(prev => prev.map(s => (s.id === id ? { ...s, status } : s)));
       toast.success(`Swap ${status === "accepted" ? "accepted" : "declined"} successfully!`);
+
+      // Notify the other party only
+      try {
+        const updated = swaps.find(s => s.id === id);
+        if (updated) {
+          const otherUserId = myId === updated.receiver_id ? updated.sender_id : updated.receiver_id;
+          const now = new Date().toISOString();
+          const actorName = (userProfile?.first_name || userProfile?.last_name)
+            ? `${userProfile?.first_name || ""}${userProfile?.last_name ? " " + userProfile?.last_name : ""}`.trim()
+            : "The recipient";
+          const message = status === "accepted"
+            ? `${actorName} accepted your swap request for "${updated.product_name || updated.product_id}".`
+            : `${actorName} rejected your swap request for "${updated.product_name || updated.product_id}".`;
+          await supabaseClient.from("notifications").insert({
+            user_id: otherUserId,
+            message,
+            read_status: false,
+            created_at: now,
+            updated_at: now,
+          });
+        }
+      } catch (nerr) {
+        console.warn("Swap decision notification insert failed", nerr);
+      }
     } catch (e: any) {
       toast.error("Failed to update swap: " + (e.message || "Unknown error"));
       setError(e.message || "Failed to update status");

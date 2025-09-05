@@ -44,7 +44,7 @@ export default function Header({ title, url }: { title: string; url: string }) {
       </div>
       <div className="flex items-center gap-3 pr-3">
         {/* Notification Dropdown */}
-        <NotificationsDropdown isAdmin={isAdmin} />
+        <NotificationsDropdown />
         
         {/* Global quick link - only show for users, not admins */}
         {!isAdmin && (

@@ -91,6 +91,24 @@ export function SwapRequestDialog({ isOpen, onClose, targetProduct }: SwapReques
       });
       if (error) throw error;
 
+      // Notify receiver (owner of target product) with actor name
+      try {
+        const now = new Date().toISOString();
+        const actorName = userProfile?.first_name || userProfile?.last_name
+          ? `${userProfile?.first_name || ""}${userProfile?.last_name ? " " + userProfile?.last_name : ""}`.trim()
+          : (userRes.user?.email || "A user");
+        const message = `${actorName} requested a swap for your product "${targetProduct.name}"`;
+        await supabaseClient.from("notifications").insert({
+          user_id: (targetProduct as any).user_id,
+          message,
+          read_status: false,
+          created_at: now,
+          updated_at: now,
+        });
+      } catch (nerr) {
+        console.warn("Swap request notification insert failed", nerr);
+      }
+
       setIsSubmitted(true);
     } catch (e: any) {
       console.error("swap insert failed", e);
