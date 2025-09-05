@@ -2,16 +2,11 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
 import { supabaseClient } from "@/lib/supabase-auth-client";
-import { Package, Send, CheckCircle, AlertCircle, CreditCard, Code, Link as LinkIcon } from "lucide-react";
-import type { RedemptionType } from "@/types/models";
 import { toast } from "sonner";
 
 export default function UserSubmitProductPage() {
@@ -27,11 +22,14 @@ export default function UserSubmitProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+
     if (!redemptionType) {
       alert("Please select a redemption type.");
       setSubmitting(false);
       return;
     }
+
+    // 1. Insert product
     const payload = {
       id: crypto.randomUUID?.() || undefined,
       user_id: user?.id,
@@ -40,12 +38,12 @@ export default function UserSubmitProductPage() {
       tags,
       redemption_type: redemptionType,
       product_link: productLink,
-      status: "pending", // set implicitly
+      status: "pending", // default status
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabaseClient.from("products").insert(payload);
+    const { error } = await supabaseClient.from("products").insert(payload);
 
     if (error) {
       toast.error("Failed to submit product: " + error.message);
@@ -53,7 +51,32 @@ export default function UserSubmitProductPage() {
       return;
     }
 
+    // 2. Notify all admins dynamically
+    try {
+      const { data: admins, error: adminError } = await supabaseClient
+        .from("users") // Make sure your "users" table has a "role" column
+        .select("id")
+        .eq("role", "admin");
+
+      if (adminError) throw adminError;
+
+      if (admins && admins.length > 0) {
+        const notifications = admins.map((a) => ({
+          user_id: a.id,
+          message: `New product submitted: ${name}`,
+          read_status: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }));
+
+        await supabaseClient.from("notifications").insert(notifications);
+      }
+    } catch (e) {
+      console.warn("Failed to create admin notifications", e);
+    }
+
     toast.success("Product submitted successfully! It will be reviewed by an admin.");
+
     // Reset form
     setName("");
     setDescription("");
