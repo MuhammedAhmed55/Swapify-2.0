@@ -1,12 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/context/AuthContext";
 import { supabaseClient } from "@/lib/supabase-auth-client";
+import { Package, Send, CheckCircle, AlertCircle, CreditCard, Code, Link as LinkIcon } from "lucide-react";
+import type { RedemptionType } from "@/types/models";
+import { toast } from "sonner";
 
 export default function UserSubmitProductPage() {
   const { user } = useAuth();
@@ -42,14 +48,13 @@ export default function UserSubmitProductPage() {
     const { data, error } = await supabaseClient.from("products").insert(payload);
 
     if (error) {
-      console.error("Error submitting product:", error);
-      alert("Failed to submit product. Please try again.");
+      toast.error("Failed to submit product: " + error.message);
       setSubmitting(false);
       return;
     }
 
-    console.log("Submit product payload", payload);
-    alert("Product submitted successfully");
+    toast.success("Product submitted successfully! It will be reviewed by an admin.");
+    // Reset form
     setName("");
     setDescription("");
     setTags("");

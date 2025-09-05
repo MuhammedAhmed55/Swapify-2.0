@@ -48,11 +48,11 @@ const features = [
 
 export default function Features() {
   return (
-    <section id="features" className="py-20 px-4 bg-white/50 dark:bg-slate-800/50">
+    <section id="features" className="py-20 px-6 bg-slate-50 dark:bg-slate-800">
       <div className="container mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white">
-            Why Indie Founders Love Swappify
+            Why Indie Founders Love Swapify
           </h2>
           <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
             The perfect platform for entrepreneurs to exchange products, build relationships, and grow together
@@ -64,7 +64,7 @@ export default function Features() {
             return (
               <Card
                 key={idx}
-                className="group hover:shadow-xl transition-all duration-300 border-0 bg-white dark:bg-slate-800 hover:-translate-y-1"
+                className="group hover:shadow-lg transition-all duration-300 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hover:-translate-y-1"
               >
                 <CardHeader>
                   <div
@@ -72,8 +72,8 @@ export default function Features() {
                   >
                     <Icon className="w-6 h-6 text-white" />
                   </div>
-                  <CardTitle className="text-xl">{f.title}</CardTitle>
-                  <CardDescription>{f.description}</CardDescription>
+                  <CardTitle className="text-xl text-slate-900 dark:text-white">{f.title}</CardTitle>
+                  <CardDescription className="text-slate-600 dark:text-slate-400">{f.description}</CardDescription>
                 </CardHeader>
               </Card>
             );

@@ -11,8 +11,12 @@ import {
 import { RiScanLine } from "@remixicon/react";
 import Link from "next/link";
 import { SidebarTrigger } from "../ui/sidebar";
+import { useAuth } from "@/context/AuthContext";
+import { UserRoles } from "@/types/types";
 
 export default function Header({ title, url }: { title: string; url: string }) {
+  const { userProfile } = useAuth();
+  const isAdmin = userProfile?.roles?.name === UserRoles.ADMIN;
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 border-b">
       <div className="flex flex-1 items-center gap-2 px-3">
@@ -38,15 +42,17 @@ export default function Header({ title, url }: { title: string; url: string }) {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      {/* Global quick link */}
-      <div className="px-3">
-        <Link
-          href="/user/browse"
-          className="inline-flex items-center rounded-md bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
-        >
-          Browse Products
-        </Link>
-      </div>
+      {/* Global quick link - only show for users, not admins */}
+      {!isAdmin && (
+        <div className="px-3">
+          <Link
+            href="/user/browse"
+            className="inline-flex items-center rounded-md bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
+          >
+            Browse Products
+          </Link>
+        </div>
+      )}
     </header>
   );
 }

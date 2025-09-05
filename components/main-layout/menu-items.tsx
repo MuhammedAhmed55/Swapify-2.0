@@ -34,6 +34,12 @@ export const getNavData = (user: { roles?: string }) => {
       icon: RiMessage2Line,
       isActive: false,
     },
+    {
+      title: "Shoutouts",
+      url: "/user/shoutouts",
+      icon: RiMessage2Line,
+      isActive: false,
+    },
   ];
 
   const adminSectionItems = [
