@@ -83,8 +83,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center  py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-sidebar hover:bg-sidebar-hover p-8 rounded-lg shadow">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-lg shadow-lg">
         <div className="flex flex-col items-center gap-2">
           {(
             settings?.logo_setting === "horizontal"
@@ -118,23 +118,23 @@ export default function Login() {
               />
             </div>
           ) : null}
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 dark:text-white">
             Welcome Back
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
             Enter your credentials to login to your account.
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="text-red-600 dark:text-red-400 text-sm text-center">
+            <div className="text-red-600 dark:text-red-400 text-sm text-center bg-red-50 dark:bg-red-900/20 p-3 rounded-md border border-red-200 dark:border-red-800">
               {error}
             </div>
           )}
           <div className="space-y-4">
             <div>
-              <Label htmlFor={`${id}-email`} className="dark:text-gray-200">
+              <Label htmlFor={`${id}-email`} className="text-slate-700 dark:text-slate-300">
                 Email
               </Label>
               <Input
@@ -144,11 +144,11 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600 focus:border-slate-500 dark:focus:border-slate-400"
               />
             </div>
             <div>
-              <Label htmlFor={`${id}-password`} className="dark:text-gray-200">
+              <Label htmlFor={`${id}-password`} className="text-slate-700 dark:text-slate-300">
                 Password
               </Label>
               <Input
@@ -158,7 +158,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600 focus:border-slate-500 dark:focus:border-slate-400"
               />
             </div>
           </div>
@@ -167,18 +167,18 @@ export default function Login() {
             <div className="flex items-center gap-2">
               <Checkbox
                 id={`${id}-remember`}
-                className="dark:border-gray-600 cursor-pointer"
+                className="border-slate-300 dark:border-slate-600 cursor-pointer"
               />
               <Label
                 htmlFor={`${id}-remember`}
-                className="text-muted-foreground font-normal dark:text-gray-400 cursor-pointer"
+                className="text-slate-600 dark:text-slate-400 font-normal cursor-pointer"
               >
                 Remember me
               </Label>
             </div>
             <Link
               href="/auth/forgot-password"
-              className="text-sm underline hover:no-underline text-primary cursor-pointer"
+              className="text-sm underline hover:no-underline text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer"
             >
               Forgot password?
             </Link>
@@ -188,7 +188,7 @@ export default function Login() {
               <Button
                 type="button"
                 onClick={handleResendVerification}
-                className={`w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md cursor-pointer`}
+                className="w-full p-2 rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isEmailVerificationLoading}
               >
                 {isEmailVerificationLoading
@@ -198,18 +198,18 @@ export default function Login() {
             )}
             <Button
               type="submit"
-              className={`w-full bg-[#ec4899] hover:bg-[#ec4899]/90 text-white p-2 rounded-md cursor-pointer`}
+              className="w-full p-2 rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </div>
 
-          <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-center text-sm text-slate-600 dark:text-slate-400">
             Don't have an account?{" "}
             <Link
               href="/auth/signup"
-              className="text-primary hover:underline cursor-pointer"
+              className="text-slate-900 dark:text-white hover:underline cursor-pointer font-medium"
             >
               Sign up
             </Link>

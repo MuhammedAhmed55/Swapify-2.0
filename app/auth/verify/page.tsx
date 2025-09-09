@@ -68,8 +68,8 @@ export default function Verify() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-sidebar hover:bg-sidebar-hover p-8 rounded-lg shadow">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-lg shadow-lg">
         <div className="flex flex-col items-center gap-2">
           {(
             settings?.logo_setting === "horizontal"
@@ -104,14 +104,14 @@ export default function Verify() {
               />
             </div>
           ) : null}
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 dark:text-white">
             Email Verification
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
             {message}
           </p>
-          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-md border border-blue-100 dark:border-blue-800">
-            <p className="text-sm text-blue-800 dark:text-blue-200">
+          <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-md border border-slate-200 dark:border-slate-700">
+            <p className="text-sm text-slate-700 dark:text-slate-300">
               <span className="font-semibold block mb-1">Important:</span>
               Please verify your email within the next 2 hours (by{" "}
               {expiryTime.toLocaleTimeString([], {
@@ -125,13 +125,13 @@ export default function Verify() {
         </div>
 
         <div className="mt-6 space-y-4">
-          <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-md border border-gray-100 dark:border-gray-700">
-            <h3 className="text-md font-medium text-gray-900 dark:text-white mb-2">
+          <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-md border border-slate-200 dark:border-slate-700">
+            <h3 className="text-md font-medium text-slate-900 dark:text-white mb-2">
               Verification Instructions:
             </h3>
-            <ol className="list-decimal pl-5 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <ol className="list-decimal pl-5 space-y-2 text-sm text-slate-600 dark:text-slate-400">
               <li>
-                Check your email inbox for a message from Daxow Agent Portal
+                Check your email inbox for a message from Swapify
               </li>
               <li>If you don't see it, check your spam or junk folder</li>
               <li>Click on the verification link in the email</li>
@@ -143,7 +143,7 @@ export default function Verify() {
           <Button
             type="button"
             onClick={handleResendVerification}
-            className="w-full bg-[#ec4899] hover:bg-[#ec4899]/90 text-white p-2 rounded-md cursor-pointer"
+            className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 p-2 rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             disabled={isLoading}
           >
             {isLoading ? "Sending..." : "Resend Verification Email"}
@@ -152,7 +152,7 @@ export default function Verify() {
           <div className="text-center">
             <Link
               href="/auth/login"
-              className="text-primary hover:underline cursor-pointer"
+              className="text-slate-900 dark:text-white hover:underline cursor-pointer font-medium"
             >
               Return to login
             </Link>

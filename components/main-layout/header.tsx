@@ -13,9 +13,14 @@ import { SidebarTrigger } from "../ui/sidebar";
 import { useAuth } from "@/context/AuthContext";
 import { UserRoles } from "@/types/types";
 import NotificationsDropdown from "@/components/notification-dropdown";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/context/ThemeContext";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sun, Moon, Laptop } from "lucide-react";
 
 export default function Header({ title, url }: { title: string; url: string }) {
   const { userProfile } = useAuth();
+  const { theme, setTheme } = useTheme();
   const isAdmin = userProfile?.roles?.name === UserRoles.ADMIN;
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 border-b">
@@ -45,15 +50,39 @@ export default function Header({ title, url }: { title: string; url: string }) {
       <div className="flex items-center gap-3 pr-3">
         {/* Notification Dropdown */}
         <NotificationsDropdown />
+
+        {/* Theme Toggle */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="rounded-full">
+              {theme === "dark" ? (
+                <Moon className="h-4 w-4" />
+              ) : theme === "light" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Laptop className="h-4 w-4" />
+              )}
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-36">
+            <DropdownMenuItem onClick={() => setTheme("light")}> 
+              <Sun className="mr-2 h-4 w-4" /> Light
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              <Moon className="mr-2 h-4 w-4" /> Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>
+              <Laptop className="mr-2 h-4 w-4" /> System
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         
         {/* Global quick link - only show for users, not admins */}
         {!isAdmin && (
-          <Link
-            href="/user/browse"
-            className="inline-flex items-center rounded-md bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
-          >
-            Browse Products
-          </Link>
+          <Button asChild size="sm" className="rounded-md px-3">
+            <Link href="/user/browse">Browse Products</Link>
+          </Button>
         )}
       </div>
     </header>

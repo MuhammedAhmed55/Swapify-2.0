@@ -70,6 +70,39 @@ export default function SwapsPage() {
 
   const updateStatus = async (id: string, status: "accepted" | "rejected") => {
     try {
+      const target = swaps.find(s => s.id === id);
+      if (!target) throw new Error("Swap not found");
+
+      // If accepting, first ensure the sender has credits and decrement them atomically
+      if (status === "accepted") {
+        const senderId = target.sender_id;
+        // Read current credits
+        const { data: prof, error: perr } = await supabaseClient
+          .from("user_profile")
+          .select("swap_limits")
+          .eq("id", senderId)
+          .single();
+        if (perr) throw perr;
+        const current = (prof as any)?.swap_limits ?? 0;
+        if (current <= 0) {
+          toast.error("Sender has no swap credits remaining. Cannot accept this swap.");
+          return;
+        }
+        // Conditional update to avoid race conditions
+        const { data: decData, error: decErr } = await supabaseClient
+          .from("user_profile")
+          .update({ swap_limits: current - 1 })
+          .eq("id", senderId)
+          .eq("swap_limits", current)
+          .select("id");
+        if (decErr) throw decErr;
+        if (!decData || decData.length === 0) {
+          // Someone else modified concurrently
+          toast.error("Swap credit update conflict. Please try again.");
+          return;
+        }
+      }
+
       const { error } = await supabaseClient.from("swaps").update({ status }).eq("id", id);
       if (error) throw error;
       // optimistic update
@@ -266,55 +299,57 @@ export default function SwapsPage() {
             ) : (
               <div className="space-y-4">
                 {incoming.map(request => (
-                  <div key={request.id} className="p-6 border border-slate-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-800 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
-                    <div className="flex items-start justify-between mb-5">
-                      <div className="flex items-center gap-4">
-                        <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl">
-                          <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-slate-900 dark:text-white text-lg">New Swap Request</h4>
-                          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mt-1">
-                            <Calendar className="h-4 w-4" />
-                            <span>{formatDate(request.created_at)}</span>
+                  <Card key={request.id} className="border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-5">
+                        <div className="flex items-center gap-4">
+                          <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl">
+                            <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-slate-900 dark:text-white text-lg">New Swap Request</h4>
+                            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mt-1">
+                              <Calendar className="h-4 w-4" />
+                              <span>{formatDate(request.created_at)}</span>
+                            </div>
                           </div>
                         </div>
+                        <Badge className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 px-3 py-2">
+                          <Clock className="h-4 w-4 mr-2" />Awaiting Response
+                        </Badge>
                       </div>
-                      <Badge className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 px-3 py-2">
-                        <Clock className="h-4 w-4 mr-2" />Awaiting Response
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-6 mb-6 p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-700/50 rounded-xl">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">They want your product</p>
-                        <p className="font-semibold text-slate-900 dark:text-white text-lg">{request.product_name || request.product_id}</p>
+                      <div className="flex items-center gap-6 mb-6 p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-700/50 rounded-xl">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">They want your product</p>
+                          <p className="font-semibold text-slate-900 dark:text-white text-lg">{request.product_name || request.product_id}</p>
+                        </div>
+                        <div className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-sm">
+                          <ArrowRightLeft className="h-6 w-6 text-slate-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">In exchange for</p>
+                          <p className="font-semibold text-slate-900 dark:text-white text-lg">Their Product</p>
+                        </div>
                       </div>
-                      <div className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-sm">
-                        <ArrowRightLeft className="h-6 w-6 text-slate-400" />
+                      <div className="flex gap-4">
+                        <Button 
+                          onClick={() => updateStatus(request.id, "accepted")} 
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1 py-3 rounded-xl font-medium shadow-sm"
+                        >
+                          <CheckCircle2 className="w-4 h-4 mr-2" />
+                          Accept Swap
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => updateStatus(request.id, "rejected")} 
+                          className="border-slate-300 dark:border-slate-600 flex-1 py-3 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-800"
+                        >
+                          <AlertCircle className="w-4 h-4 mr-2" />
+                          Decline
+                        </Button>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">In exchange for</p>
-                        <p className="font-semibold text-slate-900 dark:text-white text-lg">Their Product</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <Button 
-                        onClick={() => updateStatus(request.id, "accepted")} 
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1 py-3 rounded-xl font-medium shadow-sm"
-                      >
-                        <CheckCircle2 className="w-4 h-4 mr-2" />
-                        Accept Swap
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => updateStatus(request.id, "rejected")} 
-                        className="border-slate-300 dark:border-slate-600 flex-1 py-3 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-800"
-                      >
-                        <AlertCircle className="w-4 h-4 mr-2" />
-                        Decline
-                      </Button>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}
@@ -351,38 +386,40 @@ export default function SwapsPage() {
             ) : (
               <div className="space-y-4">
                 {outgoing.map(request => (
-                  <div key={request.id} className="p-6 border border-slate-200 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-800 hover:shadow-md transition-all duration-300">
-                    <div className="flex items-start justify-between mb-5">
-                      <div className="flex items-center gap-4">
-                        <div className="p-3 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 rounded-xl">
-                          <User className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-slate-900 dark:text-white text-lg">Sent to Product Owner</h4>
-                          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mt-1">
-                            <Calendar className="h-4 w-4" />
-                            <span>{formatDate(request.created_at)}</span>
+                  <Card key={request.id} className="border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-5">
+                        <div className="flex items-center gap-4">
+                          <div className="p-3 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 rounded-xl">
+                            <User className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-slate-900 dark:text-white text-lg">Sent to Product Owner</h4>
+                            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mt-1">
+                              <Calendar className="h-4 w-4" />
+                              <span>{formatDate(request.created_at)}</span>
+                            </div>
                           </div>
                         </div>
+                        <Badge className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 px-3 py-2">
+                          <Clock className="h-4 w-4 mr-2" />Awaiting Response
+                        </Badge>
                       </div>
-                      <Badge className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 px-3 py-2">
-                        <Clock className="h-4 w-4 mr-2" />Awaiting Response
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-6 p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-700/50 rounded-xl">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">You want</p>
-                        <p className="font-semibold text-slate-900 dark:text-white text-lg">{request.product_name || request.product_id}</p>
+                      <div className="flex items-center gap-6 p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-700/50 rounded-xl">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">You want</p>
+                          <p className="font-semibold text-slate-900 dark:text-white text-lg">{request.product_name || request.product_id}</p>
+                        </div>
+                        <div className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-sm">
+                          <ArrowRightLeft className="h-6 w-6 text-slate-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">You offered</p>
+                          <p className="font-semibold text-slate-900 dark:text-white text-lg">Your Product</p>
+                        </div>
                       </div>
-                      <div className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-sm">
-                        <ArrowRightLeft className="h-6 w-6 text-slate-400" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">You offered</p>
-                        <p className="font-semibold text-slate-900 dark:text-white text-lg">Your Product</p>
-                      </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}

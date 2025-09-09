@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { Search, Calendar, Tag, CheckCircle2, Package, Filter, ArrowUpDown, Zap, CreditCard, Settings, Sparkles, TrendingUp, Users, Eye } from "lucide-react";
 import { SwapRequestDialog } from "@/components/swap-request-dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function UserBrowseProductPage() {
   const [loading, setLoading] = useState(true)
@@ -271,23 +273,25 @@ export default function UserBrowseProductPage() {
 
         {/* Products Grid */}
         {(!loading && filtered.length === 0) ? (
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-12 text-center">
-            <div className="w-24 h-24 bg-slate-100 dark:bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Package className="w-12 h-12 text-slate-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
-              No products found
-            </h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
-              We couldn't find any products matching your search criteria. Try adjusting your filters or search terms.
-            </p>
-            <button
-              onClick={() => { setQuery(""); setFilterType("all"); setSortBy("newest") }}
-              className="bg-slate-900 text-white px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors font-medium"
-            >
-              Clear All Filters
-            </button>
-          </div>
+          <Card className="rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+            <CardContent className="p-12 text-center">
+              <div className="w-24 h-24 bg-slate-100 dark:bg-slate-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Package className="w-12 h-12 text-slate-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
+                No products found
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
+                We couldn't find any products matching your search criteria. Try adjusting your filters or search terms.
+              </p>
+              <Button
+                onClick={() => { setQuery(""); setFilterType("all"); setSortBy("newest") }}
+                className="px-6 py-3 rounded-xl font-medium"
+              >
+                Clear All Filters
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -296,11 +300,11 @@ export default function UserBrowseProductPage() {
                 const RedemptionIcon = redemptionConfig.icon;
                 
                 return (
-                  <div
+                  <Card
                     key={product.id}
-                    className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:shadow-lg border border-slate-200 dark:border-slate-700 transition-all duration-300 hover:-translate-y-1 group overflow-hidden"
+                    className="rounded-2xl shadow-sm hover:shadow-lg border border-slate-200 dark:border-slate-700 transition-all duration-300 hover:-translate-y-1 group overflow-hidden h-full flex flex-col"
                   >
-                    <div className="p-6">
+                    <CardContent className="p-6 flex flex-col h-full">
                       {/* Product Header */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1 min-w-0">
@@ -355,24 +359,23 @@ export default function UserBrowseProductPage() {
                       )}
 
                       {/* Actions */}
-                      <div className="flex gap-3">
-                        <button
+                      <div className="flex gap-3 mt-auto">
+                        <Button
                           onClick={() => { setTargetProduct(product); setDialogOpen(true) }}
-                          className="flex-1 bg-slate-900 text-white px-4 py-3 rounded-xl font-medium hover:bg-slate-800 transition-colors text-sm flex items-center justify-center gap-2"
+                          className="flex-1 text-sm rounded-xl"
                         >
                           <Zap className="w-4 h-4" />
                           Request Swap
-                        </button>
-                        <button
-                          onClick={() => toast.info("Product details coming soon")}
-                          className="px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2"
-                        >
-                          <Eye className="w-4 h-4" />
-                          Details
-                        </button>
+                        </Button>
+                        <Button variant="outline" className="text-sm rounded-xl" asChild>
+                          <Link href={`/user/products/${product.id}`}>
+                            <Eye className="w-4 h-4" />
+                            Details
+                          </Link>
+                        </Button>
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 );
               })}
             </div>

@@ -26,7 +26,7 @@ export interface Notification {
 }
 
 export default function NotificationDropdown() {
-  const { user, userProfile } = useAuth();
+  const { userProfile } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
 

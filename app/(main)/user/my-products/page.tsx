@@ -172,7 +172,7 @@ export default function UserMyProductsPage() {
           </div>
           <div className="flex items-center gap-4">
             <Link href="/user/submit">
-              <Button className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl font-medium shadow-sm">
+              <Button className="px-6 py-3 rounded-xl font-medium shadow-sm">
                 <Plus className="w-4 h-4 mr-2" />
                 Add New Product
               </Button>
@@ -270,7 +270,7 @@ export default function UserMyProductsPage() {
                     Start building your product portfolio by submitting your first product for review.
                   </p>
                   <Link href="/user/submit">
-                    <Button className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl font-medium">
+                    <Button className="px-6 py-3 rounded-xl font-medium">
                       <Plus className="w-4 h-4 mr-2" />
                       Submit Your First Product
                     </Button>
@@ -286,8 +286,8 @@ export default function UserMyProductsPage() {
                   const RedemptionIcon = redemptionConfig.icon;
                   
                   return (
-                    <Card key={product.id} className="border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
-                      <CardContent className="p-6">
+                    <Card key={product.id} className="border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group h-full flex flex-col">
+                      <CardContent className="p-6 flex flex-col h-full">
                         {/* Product Header */}
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1 min-w-0">
@@ -335,19 +335,21 @@ export default function UserMyProductsPage() {
                         )}
 
                         {/* Actions */}
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 mt-auto">
                           <Button 
                             variant="outline" 
                             size="sm" 
                             className="flex-1 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800"
+                            asChild
                           >
-                            <Eye className="w-4 h-4 mr-2" />
-                            View Details
+                            <Link href={`/user/products/${product.id}`}>
+                              <Eye className="w-4 h-4 mr-2" />
+                              View Details
+                            </Link>
                           </Button>
                           {product.status === 'approved' && (
                             <Button 
-                              size="sm" 
-                              className="bg-slate-900 hover:bg-slate-800 text-white"
+                              size="sm"
                             >
                               <BarChart3 className="w-4 h-4 mr-2" />
                               Analytics

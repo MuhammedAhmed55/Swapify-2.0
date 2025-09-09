@@ -38,8 +38,8 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-sidebar hover:bg-sidebar-hover p-8 rounded-lg shadow">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-lg shadow-lg">
         <div className="flex flex-col items-center gap-2">
           {(
             settings?.logo_setting === "horizontal"
@@ -74,27 +74,27 @@ export default function ForgotPassword() {
               />
             </div>
           ) : null}
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 dark:text-white">
             Forgot Password
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
             Enter your email to receive a password reset link.
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="text-red-600 dark:text-red-400 text-sm text-center">
+            <div className="text-red-600 dark:text-red-400 text-sm text-center bg-red-50 dark:bg-red-900/20 p-3 rounded-md border border-red-200 dark:border-red-800">
               {error}
             </div>
           )}
           {message && (
-            <div className="text-green-600 dark:text-green-400 text-sm text-center">
+            <div className="text-green-600 dark:text-green-400 text-sm text-center bg-green-50 dark:bg-green-900/20 p-3 rounded-md border border-green-200 dark:border-green-800">
               {message}
             </div>
           )}
           <div className="space-y-4">
             <div>
-              <Label htmlFor="email" className="dark:text-gray-200">
+              <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">
                 Email
               </Label>
               <Input
@@ -104,22 +104,22 @@ export default function ForgotPassword() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600 focus:border-slate-500 dark:focus:border-slate-400"
               />
             </div>
           </div>
           <Button
             type="submit"
-            className="w-full bg-[#ec4899] hover:bg-[#ec4899]/90 text-white p-2 rounded-md cursor-pointer"
+            className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 p-2 rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             disabled={isLoading}
           >
             {isLoading ? "Sending..." : "Send Reset Link"}
           </Button>
-          <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-center text-sm text-slate-600 dark:text-slate-400">
             Remember your password?{" "}
             <Link
               href="/auth/login"
-              className="text-primary hover:underline cursor-pointer"
+              className="text-slate-900 dark:text-white hover:underline cursor-pointer font-medium"
             >
               Sign in
             </Link>

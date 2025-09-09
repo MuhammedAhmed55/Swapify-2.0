@@ -82,6 +82,18 @@ export function SwapRequestDialog({ isOpen, onClose, targetProduct }: SwapReques
         throw new Error("You must be signed in to send a swap request.");
       }
 
+      // Check swap credits
+      const { data: profileRow, error: profileErr } = await supabaseClient
+        .from("user_profile")
+        .select("swap_limits")
+        .eq("id", senderId)
+        .single();
+      if (profileErr) throw profileErr;
+      const remaining = (profileRow as any)?.swap_limits ?? 0;
+      if (remaining <= 0) {
+        throw new Error("You have no swap credits left. Write a shoutout to earn +1 and try again.");
+      }
+
       // Insert into swaps table with pending status
       const { error } = await supabaseClient.from("swaps").insert({
         sender_id: senderId,

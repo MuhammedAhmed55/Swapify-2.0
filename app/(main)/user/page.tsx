@@ -22,7 +22,7 @@ import {
 import { supabaseClient } from "@/lib/supabase-auth-client";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import type { Product, Swap, Shoutout, SwapLimit } from "@/types/models";
+import type { Product, Swap, Shoutout } from "@/types/models";
 import { toast } from "sonner";
 
 interface DashboardStats {
@@ -35,7 +35,6 @@ interface DashboardStats {
   completedSwaps: number;
   totalShoutouts: number;
   availableSwaps: number;
-  usedSwaps: number;
 }
 
 export default function UserDashboardPage() {
@@ -51,8 +50,7 @@ export default function UserDashboardPage() {
     outgoingSwaps: 0,
     completedSwaps: 0,
     totalShoutouts: 0,
-    availableSwaps: 10,
-    usedSwaps: 0,
+    availableSwaps: 0,
   });
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
@@ -80,11 +78,11 @@ export default function UserDashboardPage() {
           .select("*")
           .eq("user_id", userId);
 
-        // Fetch swap limits
-        const { data: swapLimits } = await supabaseClient
-          .from("swap_limits")
-          .select("*")
-          .eq("user_id", userId)
+        // Fetch swap limits directly from user_profile
+        const { data: profile } = await supabaseClient
+          .from("user_profile")
+          .select("swap_limits")
+          .eq("id", userId)
           .single();
 
         const productList = (products as Product[]) || [];
@@ -100,8 +98,7 @@ export default function UserDashboardPage() {
           outgoingSwaps: swapList.filter(s => s.sender_id === userId && s.status === "pending").length,
           completedSwaps: swapList.filter(s => s.status === "accepted").length,
           totalShoutouts: shoutoutList.length,
-          availableSwaps: swapLimits ? (10 + swapLimits.earned_swaps - swapLimits.used_swaps) : 10,
-          usedSwaps: swapLimits?.used_swaps || 0,
+          availableSwaps: (profile as any)?.swap_limits ?? 0,
         });
 
         // Create recent activity
@@ -171,7 +168,7 @@ export default function UserDashboardPage() {
           </div>
           <div className="flex items-center gap-4">
             <Link href="/user/submit">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium shadow-sm">
+              <Button className="px-6 py-3 rounded-xl font-medium shadow-sm">
                 <Plus className="w-4 h-4 mr-2" />
                 Submit Product
               </Button>
@@ -191,8 +188,8 @@ export default function UserDashboardPage() {
                     {stats.approvedProducts} approved
                   </p>
                 </div>
-                <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-xl">
-                  <Package className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                  <Package className="h-6 w-6 text-slate-600 dark:text-slate-400" />
                 </div>
               </div>
             </CardContent>
@@ -204,9 +201,6 @@ export default function UserDashboardPage() {
                 <div>
                   <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Available Swaps</p>
                   <p className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400">{stats.availableSwaps}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    {stats.usedSwaps} used
-                  </p>
                 </div>
                 <div className="p-3 bg-emerald-100 dark:bg-emerald-900/20 rounded-xl">
                   <ArrowRightLeft className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
@@ -276,7 +270,7 @@ export default function UserDashboardPage() {
                   <Inbox className="w-4 h-4 mr-3" />
                   Manage Swaps
                   {stats.incomingSwaps > 0 && (
-                    <Badge className="ml-auto bg-blue-100 text-blue-700 border-blue-200">
+                    <Badge className="ml-auto bg-slate-100 text-slate-700 border-slate-200">
                       {stats.incomingSwaps}
                     </Badge>
                   )}
@@ -299,8 +293,14 @@ export default function UserDashboardPage() {
                   Shoutouts & Reviews
                 </Button>
               </Link>
+              <Link href="/user/history">
+                <Button variant="outline" className="w-full justify-start h-12 border-slate-200 dark:border-slate-700">
+                  <Activity className="w-4 h-4 mr-3" />
+                  Exchange History
+                </Button>
+              </Link>
               <Link href="/user/submit">
-                <Button className="w-full justify-start h-12 bg-blue-600 hover:bg-blue-700 text-white">
+                <Button className="w-full justify-start h-12">
                   <Plus className="w-4 h-4 mr-3" />
                   Submit New Product
                 </Button>
@@ -328,9 +328,9 @@ export default function UserDashboardPage() {
                   {recentActivity.map((activity, index) => (
                     <div key={index} className="flex items-center gap-4 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
                       <div className="p-2 rounded-lg bg-white dark:bg-slate-800">
-                        {activity.type === 'swap_sent' && <Send className="w-4 h-4 text-blue-600" />}
-                        {activity.type === 'swap_received' && <Inbox className="w-4 h-4 text-emerald-600" />}
-                        {activity.type === 'product_submitted' && <Package className="w-4 h-4 text-amber-600" />}
+                        {activity.type === 'swap_sent' && <Send className="w-4 h-4 text-slate-600" />}
+                        {activity.type === 'swap_received' && <Inbox className="w-4 h-4 text-slate-600" />}
+                        {activity.type === 'product_submitted' && <Package className="w-4 h-4 text-slate-600" />}
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-slate-900 dark:text-white">

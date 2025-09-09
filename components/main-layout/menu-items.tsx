@@ -5,6 +5,7 @@ import {
   RiSettings3Line,
   RiTeamLine,
   RiContactsLine,
+  RiHistoryLine,
 } from "@remixicon/react";
 
 export const getNavData = (user: { roles?: string }) => {
@@ -40,6 +41,18 @@ export const getNavData = (user: { roles?: string }) => {
       icon: RiMessage2Line,
       isActive: false,
     },
+    {
+      title: "Notifications",
+      url: "/user/notifications",
+      icon: RiMessage2Line,
+      isActive: false,
+    },
+    {
+      title: "History",
+      url: "/user/history",
+      icon: RiHistoryLine,
+      isActive: false,
+    },
   ];
 
   const adminSectionItems = [
@@ -53,6 +66,12 @@ export const getNavData = (user: { roles?: string }) => {
       title: "Product Review",
       url: "/admin/product-review",
       icon: RiContactsLine,
+      isActive: false,
+    },
+    {
+      title: "Notifications",
+      url: "/admin/notifications",
+      icon: RiMessage2Line,
       isActive: false,
     },
     {
