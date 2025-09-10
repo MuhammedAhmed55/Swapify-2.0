@@ -54,7 +54,7 @@ export default function ShoutoutsRail() {
             <CardTitle className="text-base">Recent Shoutouts</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="pt-0">
+        <CardContent className="p-6">
           {loading ? (
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (

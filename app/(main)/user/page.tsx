@@ -252,13 +252,13 @@ export default function UserDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Quick Actions */}
           <Card className="border-slate-200 dark:border-slate-700 shadow-sm">
-            <CardHeader>
+            <CardHeader className="pb-4">
               <CardTitle className="text-xl font-semibold text-slate-900 dark:text-white">Quick Actions</CardTitle>
               <CardDescription className="text-slate-600 dark:text-slate-400">
                 Jump to the most important tasks
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-6 space-y-4">
               <Link href="/user/browse">
                 <Button variant="outline" className="w-full justify-start h-12 border-slate-200 dark:border-slate-700">
                   <Eye className="w-4 h-4 mr-3" />
@@ -310,13 +310,13 @@ export default function UserDashboardPage() {
 
           {/* Recent Activity */}
           <Card className="border-slate-200 dark:border-slate-700 shadow-sm">
-            <CardHeader>
+            <CardHeader className="pb-4">
               <CardTitle className="text-xl font-semibold text-slate-900 dark:text-white">Recent Activity</CardTitle>
               <CardDescription className="text-slate-600 dark:text-slate-400">
                 Your latest platform interactions
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               {recentActivity.length === 0 ? (
                 <div className="text-center py-8">
                   <Activity className="w-8 h-8 text-slate-400 mx-auto mb-3" />

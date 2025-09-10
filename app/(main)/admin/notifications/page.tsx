@@ -119,11 +119,11 @@ export default function AdminNotificationsPage() {
             </div>
             <CardDescription>Latest platform and account activity</CardDescription>
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-6">
             {loading ? (
-              <div className="p-6 text-slate-500 dark:text-slate-400">Loading...</div>
+              <div className="text-slate-500 dark:text-slate-400">Loading...</div>
             ) : notifications.length === 0 ? (
-              <div className="p-12 text-center text-slate-500 dark:text-slate-400">
+              <div className="p-6 text-center text-slate-500 dark:text-slate-400">
                 <div className="mx-auto mb-3 w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                   <Bell className="h-6 w-6 text-slate-400" />
                 </div>
@@ -131,7 +131,7 @@ export default function AdminNotificationsPage() {
                 <p className="text-xs text-slate-400 mt-1">Activity will appear here</p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800 -m-6">
                 {notifications.map((n) => (
                   <div
                     key={n.id}

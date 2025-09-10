@@ -5,6 +5,19 @@ import Link from "next/link";
 import { supabaseClient } from "@/lib/supabase-auth-client";
 import type { Product, Swap, Shoutout } from "@/types/models";
 import { toast } from "sonner";
+import { ColumnDef } from "@tanstack/react-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowUpDown, Download, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 
 type DateRangePreset = "7d" | "30d" | "90d" | "ytd";
 type Category = "all" | "users" | "products" | "swaps" | "revenue";
@@ -59,6 +72,8 @@ export default function AdminReportsPage() {
   const [trends, setTrends] = useState<Trend[]>([]);
   const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
   const [tableRows, setTableRows] = useState<TableRow[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage] = useState(10);
 
   // Fetch and compute data for the selected preset
   useEffect(() => {
@@ -179,7 +194,8 @@ export default function AdminReportsPage() {
           );
 
         rows.sort((a, b) => (a.date > b.date ? -1 : 1));
-        setTableRows(rows.slice(0, 50));
+        setTableRows(rows);
+        setCurrentPage(0);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Failed to load reports");
       } finally {
@@ -191,6 +207,25 @@ export default function AdminReportsPage() {
   }, [preset]);
 
   const filteredTrends = useMemo(() => trends, [trends]);
+  
+  const paginatedRows = useMemo(() => {
+    const startIndex = currentPage * rowsPerPage;
+    return tableRows.slice(startIndex, startIndex + rowsPerPage);
+  }, [tableRows, currentPage, rowsPerPage]);
+  
+  const totalPages = Math.ceil(tableRows.length / rowsPerPage);
+  
+  const handleNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  const handlePrevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
   const maxForScale = useMemo(() => {
     if (category === "revenue") return Math.max(1, ...filteredTrends.map((d) => d.revenue));
     if (category === "users") return Math.max(1, ...filteredTrends.map((d) => d.users));
@@ -333,53 +368,124 @@ export default function AdminReportsPage() {
           </ul>
         </div>
 
-        <div className="lg:col-span-2 rounded-lg border p-4 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 overflow-x-auto">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-slate-600 dark:text-slate-400">Recent Activity</div>
-            <Link href="/app/(main)/admin" className="text-sm text-slate-900 dark:text-white hover:underline">
-              View dashboard
-            </Link>
-          </div>
-          <table className="mt-3 w-full text-left text-sm">
-            <thead>
-              <tr className="text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
-                <th className="py-2 pr-3">ID</th>
-                <th className="py-2 pr-3">Date</th>
-                <th className="py-2 pr-3">User</th>
-                <th className="py-2 pr-3">Product</th>
-                <th className="py-2 pr-3">Type</th>
-                <th className="py-2 pr-3 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableRows.map((r) => (
-                <tr key={r.id} className="border-b border-slate-100 dark:border-slate-800/60">
-                  <td className="py-2 pr-3 text-slate-800 dark:text-slate-200">{r.id}</td>
-                  <td className="py-2 pr-3 text-slate-600 dark:text-slate-400">{r.date}</td>
-                  <td className="py-2 pr-3 text-slate-800 dark:text-slate-200">{r.user}</td>
-                  <td className="py-2 pr-3 text-slate-700 dark:text-slate-300">{r.product}</td>
-                  <td className="py-2 pr-3">
-                    <span
-                      className={
-                        "px-2 py-0.5 rounded-md border text-xs " +
-                        (r.type === "signup"
-                          ? "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
-                          : r.type === "product"
-                          ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400"
-                          : r.type === "swap"
-                          ? "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400"
-                          : "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400")
-                      }
-                    >
-                      {r.type}
-                    </span>
-                  </td>
-                  <td className="py-2 pr-3 text-right text-slate-800 dark:text-slate-200">{r.amount ? `$${r.amount}` : "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base font-medium">Recent Activity</CardTitle>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => exportCsv(tableRows)}
+                  className="h-8 px-2 lg:px-3"
+                >
+                  <Download className="h-4 w-4" />
+                  Export
+                </Button>
+                <Link href="/app/(main)/admin">
+                  <Button variant="ghost" size="sm" className="h-8 px-2 lg:px-3">
+                    View Dashboard
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="rounded-md border mt-2">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px]">ID</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>User</TableHead>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {tableRows.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-24 text-center">
+                        No recent activity found.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    paginatedRows.map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell className="font-mono text-sm">{row.id}</TableCell>
+                        <TableCell className="text-slate-600 dark:text-slate-400">
+                          {row.date}
+                        </TableCell>
+                        <TableCell>{row.user}</TableCell>
+                        <TableCell className="max-w-[200px] truncate">
+                          {row.product}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              row.type === "signup"
+                                ? "secondary"
+                                : row.type === "product"
+                                ? "default"
+                                : row.type === "swap"
+                                ? "outline"
+                                : "destructive"
+                            }
+                            className={
+                              row.type === "signup"
+                                ? "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
+                                : row.type === "product"
+                                ? "bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/20 dark:text-blue-400"
+                                : row.type === "swap"
+                                ? "bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/20 dark:text-amber-400"
+                                : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400"
+                            }
+                          >
+                            {row.type}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {row.amount ? `$${row.amount}` : "—"}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+            {tableRows.length > 0 && (
+              <div className="flex items-center justify-between px-2 py-4">
+                <div className="text-sm text-slate-600 dark:text-slate-400">
+                  Showing {currentPage * rowsPerPage + 1} to {Math.min((currentPage + 1) * rowsPerPage, tableRows.length)} of {tableRows.length} entries
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 0}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <div className="text-sm text-slate-600 dark:text-slate-400">
+                    Page {currentPage + 1} of {totalPages}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleNextPage}
+                    disabled={currentPage >= totalPages - 1}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

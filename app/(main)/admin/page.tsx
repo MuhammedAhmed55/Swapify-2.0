@@ -345,7 +345,7 @@ export default function AdminDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Pending Product Reviews */}
           <Card className="border-slate-200 dark:border-slate-700 shadow-sm">
-            <CardHeader>
+            <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-xl font-semibold text-slate-900 dark:text-white">Pending Reviews</CardTitle>
@@ -358,7 +358,7 @@ export default function AdminDashboardPage() {
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               {pendingReviews.length === 0 ? (
                 <div className="text-center py-8">
                   <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-3" />
@@ -405,13 +405,13 @@ export default function AdminDashboardPage() {
 
           {/* Recent Platform Activity */}
           <Card className="border-slate-200 dark:border-slate-700 shadow-sm">
-            <CardHeader>
+            <CardHeader className="pb-4">
               <CardTitle className="text-xl font-semibold text-slate-900 dark:text-white">Recent Activity</CardTitle>
               <CardDescription className="text-slate-600 dark:text-slate-400">
                 Latest platform events and user actions
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               {recentActivity.length === 0 ? (
                 <div className="text-center py-8">
                   <Activity className="w-8 h-8 text-slate-400 mx-auto mb-3" />
@@ -458,13 +458,13 @@ export default function AdminDashboardPage() {
 
         {/* Quick Admin Actions */}
         <Card className="border-slate-200 dark:border-slate-700 shadow-sm">
-          <CardHeader>
+          <CardHeader className="pb-4">
             <CardTitle className="text-xl font-semibold text-slate-900 dark:text-white">Admin Actions</CardTitle>
             <CardDescription className="text-slate-600 dark:text-slate-400">
               Quick access to important admin functions
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Link href="/admin/product-review">
                 <Button variant="outline" className="w-full h-16 flex-col gap-2 border-slate-200 dark:border-slate-700">

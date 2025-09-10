@@ -271,7 +271,7 @@ export default function SwapsPage() {
 
         {/* Incoming Requests Section */}
         <Card className="border-slate-200 dark:border-slate-700 shadow-sm mb-8">
-          <CardHeader className="pb-6">
+          <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-xl">
@@ -287,7 +287,7 @@ export default function SwapsPage() {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="pt-0">
+          <CardContent className="p-6">
             {incoming.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -358,23 +358,23 @@ export default function SwapsPage() {
 
         {/* Outgoing Requests Section */}
         <Card className="border-slate-200 dark:border-slate-700 shadow-sm">
-          <CardHeader className="pb-6">
+          <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-amber-100 dark:bg-amber-900/20 rounded-xl">
                   <Send className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-slate-900 dark:text-white">Your Requests</CardTitle>
-                  <CardDescription className="text-slate-600 dark:text-slate-400">Track the status of your outgoing swap requests</CardDescription>
+                  <CardTitle className="text-xl font-semibold text-slate-900 dark:text-white">Outgoing Requests</CardTitle>
+                  <CardDescription className="text-slate-600 dark:text-slate-400">Track your swap requests to other users</CardDescription>
                 </div>
               </div>
               <Badge className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 px-3 py-1">
-                {outgoing.length} pending
+                {outgoing.length} sent
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="pt-0">
+          <CardContent className="p-6">
             {outgoing.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">

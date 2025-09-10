@@ -129,18 +129,20 @@ export default function ExchangeHistoryPage() {
 
         {/* History List */}
         <Card className="border-slate-200 dark:border-slate-700 shadow-sm">
-          <CardHeader className="pb-6">
+          <CardHeader className="pb-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl">
                 <ArrowRightLeft className="h-5 w-5 text-slate-600 dark:text-slate-400" />
               </div>
               <div>
-                <CardTitle className="text-xl font-semibold text-slate-900 dark:text-white">Completed Swaps</CardTitle>
-                <CardDescription className="text-slate-600 dark:text-slate-400">Your accepted exchanges</CardDescription>
+                <CardTitle className="text-xl font-semibold text-slate-900 dark:text-white">Exchange History</CardTitle>
+                <CardDescription className="text-slate-600 dark:text-slate-400">
+                  Complete record of all your swap transactions
+                </CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="pt-0">
+          <CardContent className="p-6">
             {filtered.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
